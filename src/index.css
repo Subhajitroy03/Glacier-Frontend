@@ -160,6 +160,63 @@
       opacity: 0.7;
     }
   }
+
+  /* Leaflet Tooltip Customization */
+  .lake-tooltip {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .lake-tooltip::before {
+    display: none !important;
+  }
+
+  /* Pulse ring animation for high-risk markers */
+  .pulse-ring {
+    animation: pulseRing 2s ease-out infinite;
+  }
+
+  @keyframes pulseRing {
+    0% {
+      stroke-opacity: 0.6;
+      fill-opacity: 0.3;
+    }
+    50% {
+      stroke-opacity: 0.3;
+      fill-opacity: 0.15;
+    }
+    100% {
+      stroke-opacity: 0.6;
+      fill-opacity: 0.3;
+    }
+  }
+
+  /* Leaflet container styles */
+  .leaflet-container {
+    background: hsl(220 40% 7%) !important;
+    font-family: 'Outfit', system-ui, sans-serif;
+  }
+
+  .leaflet-control-zoom a {
+    background: hsl(220 35% 12%) !important;
+    color: hsl(210 40% 96%) !important;
+    border-color: hsl(195 50% 50% / 0.2) !important;
+  }
+
+  .leaflet-control-zoom a:hover {
+    background: hsl(220 30% 18%) !important;
+  }
+
+  .leaflet-control-attribution {
+    background: hsl(220 35% 10% / 0.8) !important;
+    color: hsl(215 20% 55%) !important;
+  }
+
+  .leaflet-control-attribution a {
+    color: hsl(195 100% 50%) !important;
+  }
 }
 
 @layer utilities {
