@@ -34,30 +34,14 @@ const MapView = ({ filters, onLakeSelect, selectedLake }: MapViewProps) => {
       zoomControl: false,
     });
 
-    // Dark tile layer (CartoDB Dark Matter)
-    const darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap &copy; CARTO',
+    // Add dark tile layer (CartoDB Dark Matter - free, no API key)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
       subdomains: 'abcd',
       maxZoom: 19,
-    });
+    }).addTo(map.current);
 
-    // Topographical tile layer (OpenTopoMap - free, no API key)
-    const topoLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenTopoMap contributors',
-      maxZoom: 17,
-    });
-
-    // Add dark layer as default
-    darkLayer.addTo(map.current);
-
-    // Layer control for switching
-    const baseMaps = {
-      "Dark": darkLayer,
-      "Topographic": topoLayer,
-    };
-    L.control.layers(baseMaps, {}, { position: 'topright' }).addTo(map.current);
-
-    // Add zoom control
+    // Add zoom control to top-right
     L.control.zoom({ position: 'topright' }).addTo(map.current);
 
     // Add scale control
