@@ -1,5 +1,4 @@
-import { X, MapPin, Mountain, Ruler, Calendar, Download, FileText, FileJson, ChevronDown, ChevronRight, ExternalLink } from 'lucide-react';
-import { GlacierLake } from '@/data/lakesData';
+import { X, MapPin, Mountain, Ruler, Calendar, FileText, FileJson, ChevronDown, ChevronRight, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
@@ -9,12 +8,7 @@ import TimeSeriesChart from './TimeSeriesChart';
 import ModelExplanation from './ModelExplanation';
 import { useState } from 'react';
 
-interface LakeDetailPanelProps {
-  lake: GlacierLake | null;
-  onClose: () => void;
-}
-
-const LakeDetailPanel = ({ lake, onClose }: LakeDetailPanelProps) => {
+const LakeDetailPanel = ({ lake, onClose }) => {
   const [historyOpen, setHistoryOpen] = useState(true);
 
   if (!lake) return null;

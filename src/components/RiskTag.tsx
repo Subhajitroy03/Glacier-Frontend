@@ -1,20 +1,14 @@
 import { cn } from '@/lib/utils';
-import { RiskLevel, getRiskLabel } from '@/data/lakesData';
+import { getRiskLabel } from '@/data/lakesData';
 import { AlertTriangle, AlertCircle, CheckCircle } from 'lucide-react';
 
-interface RiskTagProps {
-  level: RiskLevel;
-  score?: number;
-  size?: 'sm' | 'md' | 'lg';
-  showIcon?: boolean;
-}
-
-const RiskTag = ({ level, score, size = 'md', showIcon = true }: RiskTagProps) => {
+const RiskTag = ({ level, score, size = 'md', showIcon = true }) => {
   const getIcon = () => {
     switch (level) {
       case 'high': return AlertTriangle;
       case 'medium': return AlertCircle;
       case 'low': return CheckCircle;
+      default: return CheckCircle;
     }
   };
 

@@ -2,9 +2,10 @@ import { useState } from 'react';
 import TopNavbar from '@/components/TopNavbar';
 import FilterSidebar from '@/components/FilterSidebar';
 import MapView from '@/components/MapView';
-import RiskLegend from '@/components/RiskLegend';
+
 import LakeDetailPanel from '@/components/LakeDetailPanel';
 import { GlacierLake } from '@/data/lakesData';
+import UploadDataPage from "@/components/uploaddatapage"
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -30,49 +31,62 @@ const Index = () => {
 
       {/* Main Content */}
       <main className="pt-16 h-screen">
-        {activeTab === 'dashboard' ? (
-          <div className="relative h-full">
-            {/* Filter Sidebar */}
-            <FilterSidebar filters={filters} onFiltersChange={setFilters} />
+  {activeTab === "dashboard" && (
+    <div className="relative h-full">
+      {/* Filter Sidebar */}
+      <FilterSidebar filters={filters} onFiltersChange={setFilters} />
 
-            {/* Map View */}
-            <div className="h-full ml-64 transition-all duration-300">
-              <MapView
-                filters={filters}
-                onLakeSelect={handleLakeSelect}
-                selectedLake={selectedLake}
-              />
-            </div>
+      {/* Map View */}
+      <div className="h-full ml-64 transition-all duration-300">
+        <MapView
+          filters={filters}
+          onLakeSelect={handleLakeSelect}
+          selectedLake={selectedLake}
+        />
+      </div>
 
-            {/* Risk Legend */}
-            <RiskLegend />
+     
 
-            {/* Lake Detail Panel */}
-            <LakeDetailPanel lake={selectedLake} onClose={handleClosePanel} />
+      {/* Lake Detail Panel */}
+      <LakeDetailPanel lake={selectedLake} onClose={handleClosePanel} />
 
-            {/* Click outside to close panel */}
-            {selectedLake && (
-              <div
-                className="fixed inset-0 z-30 sm:hidden"
-                onClick={handleClosePanel}
-              />
-            )}
-          </div>
-        ) : (
-          <div className="flex items-center justify-center h-full">
-            <div className="glass-panel p-8 text-center max-w-md">
-              <h2 className="text-xl font-bold text-foreground mb-2">
-                {activeTab === 'insights' && 'Model Insights'}
-                {activeTab === 'upload' && 'Upload Data'}
-                {activeTab === 'about' && 'About GLOF Predictor'}
-              </h2>
-              <p className="text-muted-foreground">
-                This section is coming soon. The dashboard view provides full glacier lake monitoring and risk assessment.
-              </p>
-            </div>
-          </div>
-        )}
-      </main>
+      {/* Mobile overlay */}
+      {selectedLake && (
+        <div
+          className="fixed inset-0 z-30 sm:hidden"
+          onClick={handleClosePanel}
+        />
+      )}
+    </div>
+  )}
+
+  {activeTab === "upload" && (
+    <UploadDataPage />
+  )}
+
+  {activeTab === "insights" && (
+    <div className="flex items-center justify-center h-full">
+      <div className="glass-panel p-8 text-center max-w-md">
+        <h2 className="text-xl font-bold mb-2">Model Insights</h2>
+        <p className="text-muted-foreground">
+          This section is coming soon.
+        </p>
+      </div>
+    </div>
+  )}
+
+  {activeTab === "about" && (
+    <div className="flex items-center justify-center h-full">
+      <div className="glass-panel p-8 text-center max-w-md">
+        <h2 className="text-xl font-bold mb-2">About GLOF Predictor</h2>
+        <p className="text-muted-foreground">
+          Glacier Lake Outburst Flood prediction and monitoring system.
+        </p>
+      </div>
+    </div>
+  )}
+</main>
+
     </div>
   );
 };

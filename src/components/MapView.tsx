@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+
 import { GlacierLake, glacierLakes, getRiskColor } from '@/data/lakesData';
 
 interface MapViewProps {
@@ -13,118 +14,127 @@ interface MapViewProps {
   selectedLake: GlacierLake | null;
 }
 
-// MapLibre API key from environment
-const MAPLIBRE_API_KEY = import.meta.env.VITE_MAPLIBRE_API_KEY || '';
+// ✅ Geoapify key (MUST be prefixed with VITE_)
+const GEOAPIFY_API_KEY = import.meta.env.VITE_GEOAPIFY_API_KEY;
 
 const MapView = ({ filters, onLakeSelect, selectedLake }: MapViewProps) => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<maplibregl.Map | null>(null);
+  const mapContainer = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<maplibregl.Map | null>(null);
   const markersRef = useRef<maplibregl.Marker[]>([]);
   const popupRef = useRef<maplibregl.Popup | null>(null);
 
   const filteredLakes = glacierLakes.filter((lake) => {
     if (!filters.riskLevels.includes(lake.riskLevel)) return false;
-    if (filters.searchQuery && !lake.name.toLowerCase().includes(filters.searchQuery.toLowerCase())) return false;
+    if (
+      filters.searchQuery &&
+      !lake.name.toLowerCase().includes(filters.searchQuery.toLowerCase())
+    )
+      return false;
     return true;
   });
 
-  // Initialize map
+  /* =======================
+     MAP INITIALIZATION
+     ======================= */
   useEffect(() => {
-    if (!mapContainer.current || map.current) return;
+    if (!mapContainer.current || mapRef.current) return;
 
-    map.current = new maplibregl.Map({
+    if (!GEOAPIFY_API_KEY) {
+      console.error('Geoapify API key missing');
+      return;
+    }
+
+    mapRef.current = new maplibregl.Map({
       container: mapContainer.current,
-      style: `https://api.maptiler.com/maps/dataviz-dark/style.json?key=${MAPLIBRE_API_KEY}`,
+      style: `https://maps.geoapify.com/v1/styles/osm-liberty/style.json?apiKey=${GEOAPIFY_API_KEY}`,
       center: [86.5, 27.9],
       zoom: 9,
-      pitch: 45,
+      pitch: 0,
       bearing: 0,
     });
 
-    // Add navigation controls
-    map.current.addControl(new maplibregl.NavigationControl(), 'top-right');
-    map.current.addControl(new maplibregl.ScaleControl(), 'bottom-right');
+    mapRef.current.addControl(
+      new maplibregl.NavigationControl(),
+      'top-right'
+    );
 
-    // Add terrain if available
-    map.current.on('load', () => {
-      // Add 3D terrain
-      map.current?.addSource('terrain', {
-        type: 'raster-dem',
-        url: `https://api.maptiler.com/tiles/terrain-rgb/tiles.json?key=${MAPLIBRE_API_KEY}`,
-        tileSize: 256,
-      });
-      
-      map.current?.setTerrain({ source: 'terrain', exaggeration: 1.5 });
+    mapRef.current.on('error', (e) => {
+      console.error('MapLibre error:', e.error);
     });
 
     return () => {
-      map.current?.remove();
-      map.current = null;
+      mapRef.current?.remove();
+      mapRef.current = null;
     };
   }, []);
 
-  // Update markers when filters or selection changes
+  /* =======================
+     MARKERS & POPUPS
+     ======================= */
   useEffect(() => {
-    if (!map.current) return;
+    if (!mapRef.current) return;
 
-    // Clear existing markers
-    markersRef.current.forEach((marker) => marker.remove());
+    // Clear old markers
+    markersRef.current.forEach((m) => m.remove());
     markersRef.current = [];
-
-    // Close any open popup
     popupRef.current?.remove();
 
-    // Add markers for filtered lakes
     filteredLakes.forEach((lake) => {
       const color = getRiskColor(lake.riskLevel);
       const isHighRisk = lake.riskLevel === 'high';
       const isSelected = selectedLake?.id === lake.id;
 
-      // Create custom marker element
       const el = document.createElement('div');
       el.className = 'lake-marker';
       el.style.cssText = `
         width: ${isSelected ? '28px' : '20px'};
         height: ${isSelected ? '28px' : '20px'};
-        background-color: ${color};
+        background: ${color};
         border: 2px solid white;
         border-radius: 50%;
         cursor: pointer;
-        box-shadow: 0 0 ${isHighRisk ? '15px' : '8px'} ${color}80;
-        transition: all 0.3s ease;
+        box-shadow: 0 0 ${isHighRisk ? '14px' : '8px'} ${color}88;
+        transition: all 0.25s ease;
       `;
 
-      // Add pulsing effect for high-risk lakes
       if (isHighRisk) {
-        el.style.animation = 'marker-pulse 2s ease-in-out infinite';
+        el.style.animation = 'marker-pulse 2s infinite';
       }
 
-      // Create marker
       const marker = new maplibregl.Marker({ element: el })
         .setLngLat([lake.coordinates[0], lake.coordinates[1]])
-        .addTo(map.current!);
+        .addTo(mapRef.current!);
 
-      // Create popup for hover
       const popup = new maplibregl.Popup({
         closeButton: false,
         closeOnClick: false,
-        offset: 15,
-        className: 'lake-popup',
+        offset: 12,
       }).setHTML(`
-        <div class="p-3 rounded-lg" style="background: hsl(220, 35%, 10%); border: 1px solid hsl(195, 50%, 50%, 0.2);">
-          <div class="font-semibold text-sm" style="color: hsl(210, 40%, 96%);">${lake.name}</div>
-          <div class="text-xs mt-1" style="color: hsl(215, 20%, 55%);">
-            Risk: <span style="color: ${color}; font-weight: 600;">${(lake.riskScore * 100).toFixed(0)}%</span>
+        <div style="
+          background: #0b1220;
+          border: 1px solid rgba(56,189,248,0.25);
+          border-radius: 10px;
+          padding: 10px 12px;
+          font-size: 12px;
+          color: #e5e7eb;
+        ">
+          <div style="font-weight:600;">${lake.name}</div>
+          <div style="margin-top:4px;">
+            Risk:
+            <span style="color:${color}; font-weight:600;">
+              ${(lake.riskScore * 100).toFixed(0)}%
+            </span>
           </div>
-          <div class="text-xs" style="color: hsl(215, 20%, 55%);">
-            ${lake.riskLevel.charAt(0).toUpperCase() + lake.riskLevel.slice(1)} Risk
+          <div style="opacity:0.7;">
+            ${lake.riskLevel.toUpperCase()} RISK
           </div>
         </div>
       `);
 
-      // Hover handlers
       el.addEventListener('mouseenter', () => {
-        popup.setLngLat([lake.coordinates[0], lake.coordinates[1]]).addTo(map.current!);
+        popup
+          .setLngLat([lake.coordinates[0], lake.coordinates[1]])
+          .addTo(mapRef.current!);
         popupRef.current = popup;
       });
 
@@ -132,13 +142,12 @@ const MapView = ({ filters, onLakeSelect, selectedLake }: MapViewProps) => {
         popup.remove();
       });
 
-      // Click handler
       el.addEventListener('click', () => {
         onLakeSelect(lake);
-        map.current?.flyTo({
+        mapRef.current?.flyTo({
           center: [lake.coordinates[0], lake.coordinates[1]],
           zoom: 11,
-          duration: 1500,
+          duration: 1200,
         });
       });
 
@@ -146,20 +155,20 @@ const MapView = ({ filters, onLakeSelect, selectedLake }: MapViewProps) => {
     });
   }, [filteredLakes, selectedLake, onLakeSelect]);
 
+  /* =======================
+     RENDER
+     ======================= */
   return (
-    <div className="h-full w-full relative">
-      <div ref={mapContainer} className="absolute inset-0" />
-      {/* Gradient overlay at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background/50 to-transparent pointer-events-none" />
-      
-      {/* API key warning */}
-      {!MAPLIBRE_API_KEY && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-destructive/90 text-destructive-foreground px-4 py-2 rounded-lg text-sm">
-          MapLibre API key not configured. Add VITE_MAPLIBRE_API_KEY to your environment.
-        </div>
-      )}
-    </div>
-  );
+  <div className="fixed inset-0 w-screen h-screen">
+    <div ref={mapContainer} className="absolute inset-0" />
+
+    {!GEOAPIFY_API_KEY && (
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-red-600 text-white px-4 py-2 rounded-md text-sm z-50">
+        Geoapify API key not configured
+      </div>
+    )}
+  </div>
+);
 };
 
 export default MapView;
