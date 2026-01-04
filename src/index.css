@@ -1,0 +1,250 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+@layer base {
+  :root {
+    /* Glacier Dark Theme - Deep Navy Base */
+    --background: 220 40% 7%;
+    --foreground: 210 40% 96%;
+
+    --card: 220 35% 10%;
+    --card-foreground: 210 40% 96%;
+
+    --popover: 220 35% 12%;
+    --popover-foreground: 210 40% 96%;
+
+    /* Ice Blue Primary */
+    --primary: 195 100% 50%;
+    --primary-foreground: 220 40% 7%;
+
+    /* Frosted Secondary */
+    --secondary: 220 30% 15%;
+    --secondary-foreground: 210 40% 90%;
+
+    --muted: 220 25% 18%;
+    --muted-foreground: 215 20% 55%;
+
+    /* Ice Accent */
+    --accent: 195 80% 60%;
+    --accent-foreground: 220 40% 7%;
+
+    /* Risk Colors */
+    --destructive: 4 90% 58%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 32 95% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --safe: 195 100% 50%;
+    --safe-foreground: 220 40% 7%;
+
+    --border: 220 25% 18%;
+    --input: 220 25% 15%;
+    --ring: 195 100% 50%;
+
+    --radius: 0.75rem;
+
+    /* Glacier Gradients */
+    --gradient-ice: linear-gradient(135deg, hsl(195 100% 80%) 0%, hsl(210 100% 95%) 100%);
+    --gradient-frost: linear-gradient(180deg, hsl(220 30% 15% / 0.8) 0%, hsl(220 35% 10% / 0.95) 100%);
+    --gradient-glow: radial-gradient(ellipse at center, hsl(195 100% 50% / 0.15) 0%, transparent 70%);
+    --gradient-danger: radial-gradient(ellipse at center, hsl(4 90% 58% / 0.3) 0%, transparent 70%);
+
+    /* Glass Effect */
+    --glass-bg: hsl(220 30% 12% / 0.7);
+    --glass-border: hsl(195 50% 50% / 0.2);
+    --glass-shadow: 0 8px 32px hsl(220 40% 5% / 0.5);
+
+    --sidebar-background: 220 35% 8%;
+    --sidebar-foreground: 210 40% 90%;
+    --sidebar-primary: 195 100% 50%;
+    --sidebar-primary-foreground: 220 40% 7%;
+    --sidebar-accent: 220 30% 15%;
+    --sidebar-accent-foreground: 210 40% 90%;
+    --sidebar-border: 220 25% 18%;
+    --sidebar-ring: 195 100% 50%;
+  }
+
+  .dark {
+    --background: 220 40% 7%;
+    --foreground: 210 40% 96%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Outfit', system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', system-ui, sans-serif;
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  /* Glassmorphism Panel */
+  .glass-panel {
+    @apply bg-card/70 backdrop-blur-xl border border-glass rounded-xl;
+    box-shadow: var(--glass-shadow);
+  }
+
+  /* Risk Badges */
+  .risk-high {
+    @apply bg-destructive/20 text-destructive border border-destructive/30;
+  }
+
+  .risk-medium {
+    @apply bg-warning/20 text-warning border border-warning/30;
+  }
+
+  .risk-low {
+    @apply bg-safe/20 text-safe border border-safe/30;
+  }
+
+  /* Pulsing Glow for High Risk */
+  .pulse-danger {
+    animation: pulse-danger 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-danger {
+    0%, 100% {
+      box-shadow: 0 0 20px hsl(4 90% 58% / 0.4), 0 0 40px hsl(4 90% 58% / 0.2);
+    }
+    50% {
+      box-shadow: 0 0 30px hsl(4 90% 58% / 0.6), 0 0 60px hsl(4 90% 58% / 0.3);
+    }
+  }
+
+  /* Ice Glow */
+  .glow-ice {
+    box-shadow: 0 0 20px hsl(195 100% 50% / 0.3), 0 0 40px hsl(195 100% 50% / 0.1);
+  }
+
+  /* Smooth slide animation */
+  .slide-in-right {
+    animation: slideInRight 0.3s ease-out;
+  }
+
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  /* Map marker pulse */
+  .marker-pulse {
+    animation: markerPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes markerPulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 0.7;
+    }
+  }
+
+  /* MapLibre Popup Customization */
+  .lake-popup .maplibregl-popup-content {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .lake-popup .maplibregl-popup-tip {
+    display: none !important;
+  }
+
+  /* MapLibre marker pulse animation */
+  @keyframes marker-pulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 15px currentColor;
+    }
+    50% {
+      transform: scale(1.15);
+      box-shadow: 0 0 25px currentColor;
+    }
+  }
+
+  /* MapLibre container styles */
+  .maplibregl-map {
+    font-family: 'Outfit', system-ui, sans-serif;
+  }
+
+  .maplibregl-ctrl-group button {
+    background: hsl(220 35% 12%) !important;
+    color: hsl(210 40% 96%) !important;
+    border-color: hsl(195 50% 50% / 0.2) !important;
+  }
+
+  .maplibregl-ctrl-group button:hover {
+    background: hsl(220 30% 18%) !important;
+  }
+
+  .maplibregl-ctrl-group button span {
+    filter: invert(1);
+  }
+
+  .maplibregl-ctrl-attrib {
+    background: hsl(220 35% 10% / 0.8) !important;
+    color: hsl(215 20% 55%) !important;
+  }
+
+  .maplibregl-ctrl-attrib a {
+    color: hsl(195 100% 50%) !important;
+  }
+
+  .maplibregl-ctrl-scale {
+    background: hsl(220 35% 10% / 0.8) !important;
+    color: hsl(215 20% 55%) !important;
+    border-color: hsl(195 50% 50% / 0.3) !important;
+  }
+}
+
+@layer utilities {
+  .text-gradient-ice {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(195 100% 70%), hsl(210 100% 90%));
+  }
+
+  .border-glass {
+    border-color: hsl(195 50% 50% / 0.2);
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(220 25% 25%) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: hsl(220 25% 25%);
+    border-radius: 3px;
+  }
+}
